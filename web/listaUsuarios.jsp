@@ -31,6 +31,7 @@
                 <td><input type="text" name="nombre" value="<%= usuario.getNombre() %>"></td>
                 <td><input type="text" name="apellido" value="<%= usuario.getApellido() %>"></td>
                 <td><input type="text" name="usuario" value="<%= usuario.getUsuario() %>"></td>
+                <td><input type="text" name="correo" value="<%= usuario.getCorreo() %>"></td>
                 <input type="hidden" name="id" value="<%= usuario.getId() %>">
                 <td>
                     <input type="submit" name="action" value="editar">

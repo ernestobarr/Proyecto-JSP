@@ -22,6 +22,7 @@
         Nombre: <input type="text" name="nombre" value="<%= request.getParameter("nombre") != null ? request.getParameter("nombre") : "" %>"><br>
 Apellido: <input type="text" name="apellido" value="<%= request.getParameter("apellido") != null ? request.getParameter("apellido") : "" %>"><br>
 Usuario: <input type="text" name="usuario" value="<%= request.getParameter("usuario") != null ? request.getParameter("usuario") : "" %>"><br>
+Correo: <input type="text" name="correo" value="<%= request.getParameter("correo") != null ? request.getParameter("correo") : "" %>"><br>
 Clave: <input type="password" name="clave" value="<%= request.getParameter("clave") != null ? request.getParameter("clave") : "" %>"><br>
 
         <input type="submit" value="Guardar">

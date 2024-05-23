@@ -72,10 +72,11 @@ public class CRUDUsuarioServlet extends HttpServlet {
         String nombre = request.getParameter("nombre");
         String apellido = request.getParameter("apellido");
         String usuario = request.getParameter("usuario");
+        String correo = request.getParameter("correo");
         String clave = request.getParameter("clave");
         
         // Crear un objeto UserModel con los datos recibidos
-        UserModel nuevoUsuario = new UserModel(0, nombre, apellido, usuario, clave);
+        UserModel nuevoUsuario = new UserModel(0, nombre, apellido, correo, usuario, clave);
 
         // Llamar al método en UsuarioDAO para crear un nuevo usuario en la base de datos
         UsuarioDAO usuarioDAO = new UsuarioDAO();
@@ -91,13 +92,14 @@ public class CRUDUsuarioServlet extends HttpServlet {
     String nombre = request.getParameter("nombre");
     String apellido = request.getParameter("apellido");
     String usuario = request.getParameter("usuario");
+    String correo = request.getParameter("correo");
     
     // Recuperar la contraseña actual del usuario desde la base de datos
     UsuarioDAO usuarioDAO = new UsuarioDAO();
     String clave = usuarioDAO.obtenerClaveUsuarioPorId(id); 
     
     // Crear un objeto UserModel con los datos editados y la contraseña recuperada
-    UserModel usuarioEditado = new UserModel(id, nombre, apellido, usuario, clave);
+    UserModel usuarioEditado = new UserModel(id, nombre, apellido, usuario);
 
     // Llamar al método en UsuarioDAO para actualizar el usuario en la base de datos
     usuarioDAO.actualizarUsuario(usuarioEditado);
