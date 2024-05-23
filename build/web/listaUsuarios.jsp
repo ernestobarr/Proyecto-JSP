@@ -10,6 +10,7 @@
     <title>Lista de Usuarios</title>
 </head>
 <body>
+    <a href="menu.jsp">Volver a Menu</a>
     <h1>Lista de Usuarios</h1>
     <table border="1">
         <tr>

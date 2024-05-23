@@ -5,7 +5,24 @@ import javax.servlet.http.*;
 import java.io.*;
 import Model.UserModel;
 import DAO.UsuarioDAO;
+import java.security.SecureRandom;
 import javax.servlet.annotation.WebServlet;
+
+
+import javax.mail.internet.*;
+import java.util.Properties;
+import javax.mail.Authenticator;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.PasswordAuthentication;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
+
+import javax.activation.DataHandler;
+
+
 
 @WebServlet("/CRUDUsuarioServlet")
 public class CRUDUsuarioServlet extends HttpServlet {
@@ -39,6 +56,9 @@ public class CRUDUsuarioServlet extends HttpServlet {
                     break;
                 case "borrar":
                     borrarUsuario(request, response); // Utilizamos otro método para la acción de borrar
+                    break;
+                case "resetPassword":
+                    resetPassword(request, response);
                     break;
                 default:
                     // Manejar caso no válido
@@ -99,4 +119,105 @@ public class CRUDUsuarioServlet extends HttpServlet {
         // Redirigir a la lista de usuarios después de borrar
         response.sendRedirect("listaUsuarios.jsp");
     }
+    
+    private void resetPassword(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+                
+        // Verificar si la solicitud es nula
+        if (request == null) {
+            // Redirigir al inicio de sesión si no hay solicitud
+            response.sendRedirect("resetPassword.jsp");
+            return; // 
+        }
+        
+        // Obtener User
+        String usuario = request.getParameter("usuario");
+        
+        // Si no se proporciona ningún usuario, redirigir al inicio de sesión
+        if(usuario.isEmpty() || usuario.isBlank()) {
+            response.sendRedirect("login.jsp");
+            return; // ¡
+        }
+        
+        // Generar una nueva contraseña aleatoria
+        String newPassword = generarContraseñaAleatoria();              
+        
+        UserModel userModel = new UserModel(0, "", "", "", "", "");
+        
+        // Llamar al método en UsuarioDAO para Obtener Usuario
+        UsuarioDAO usuarioDAO = new UsuarioDAO();
+        userModel = usuarioDAO.obtenerPorUsuario(usuario);
+        
+        //si no tiene correo no hacemos cambio
+        if(userModel.getCorreo().isEmpty() || userModel.getCorreo().isBlank()){
+            response.sendRedirect("login.jsp");
+            return; //
+        }
+        
+        //actualizar password
+        usuarioDAO.actualizarPassword(userModel.getId(), newPassword);
+        
+        //Enviar Correo
+        enviarCorreo(userModel.getCorreo(), newPassword);
+        
+        // Redirigir a alguna página de confirmación o volver a la lista de usuarios
+        response.sendRedirect("login.jsp");
+    }
+
+    
+     // Método para generar una contraseña aleatoria
+    private String generarContraseñaAleatoria() {
+        String caracteres = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        StringBuilder sb = new StringBuilder();
+        SecureRandom random = new SecureRandom();
+        for (int i = 0; i < 8; i++) {
+            int index = random.nextInt(caracteres.length());
+            sb.append(caracteres.charAt(index));
+        }
+        return sb.toString();
+    }
+    
+    // Método para enviar un correo electrónico con la nueva contraseña
+    private void enviarCorreo(String destinatario, String newPassword) {
+     // Datos quemados del remitente
+        String remitente = "pruebas.aspnet2023@gmail.com";
+        String asunto = "Reinicio Password";
+
+        // Configurar las propiedades del servidor SMTP
+        Properties props = new Properties();
+        props.put("mail.smtp.host", "smtp.gmail.com");
+        props.put("mail.smtp.socketFactory.port", "465");
+        props.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
+        props.put("mail.smtp.auth", "true");
+        props.put("mail.smtp.port", "465");
+
+        // Crear una sesión de correo electrónico con autenticación
+        Session session = Session.getDefaultInstance(props,
+            new javax.mail.Authenticator() {
+                protected PasswordAuthentication getPasswordAuthentication() {
+                    return new PasswordAuthentication(remitente, "lhntrqontbhaqlct");
+                }
+            });
+
+        try {
+            // Crear un objeto Message
+            Message message = new MimeMessage(session);
+            // Configurar el remitente
+            message.setFrom(new InternetAddress(remitente));
+            // Configurar el destinatario
+            message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(destinatario));
+            // Configurar el asunto
+            message.setSubject(asunto);
+            // Configurar el contenido del mensaje
+            message.setText("Su contraseña temporal es: " + newPassword);
+
+            // Enviar el mensaje
+            Transport.send(message);
+
+            System.out.println("¡El correo electrónico ha sido enviado correctamente!");
+
+        } catch (MessagingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    
 }

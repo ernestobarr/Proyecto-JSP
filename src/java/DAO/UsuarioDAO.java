@@ -10,6 +10,7 @@ public class UsuarioDAO {
     private static final String INSERT_USUARIO_SQL = "INSERT INTO Users (nombre, apellido, usuario, clave) VALUES (?, ?, ?, ?)";
     private static final String SELECT_ALL_USUARIOS = "SELECT * FROM Users";
       private static final String UPDATE_USUARIO_SQL = "UPDATE Users SET nombre=?, apellido=?, usuario=?, clave=? WHERE id=?";
+      private static final String UPDATE_PASSWORD_USUARIO_SQL = "UPDATE Users SET clave=? WHERE id=?";
     private static final String DELETE_USUARIO_SQL = "DELETE FROM Users WHERE id=?";
     
     
@@ -46,6 +47,33 @@ public class UsuarioDAO {
         
         return clave;
     }
+    
+    // Método para obtener la contraseña de un usuario por su ID
+    public UserModel obtenerPorUsuario(String user) {
+        UserModel userModel = new UserModel(0, "", "", "", "", "");
+        String sql = "SELECT * FROM Users WHERE usuario = ?";
+        
+        try (Connection connection = conexion.conectar();
+             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setString(1, user);
+            try (ResultSet rs = preparedStatement.executeQuery()) {
+                if (rs.next()) {
+                                        
+                    int id = rs.getInt("id");
+                    String nombre = rs.getString("nombre");
+                    String apellido = rs.getString("apellido");
+                    String usuario = rs.getString("usuario");
+                    String correo = rs.getString("correo");
+                    String clave = rs.getString("clave");
+                    userModel = new UserModel(id, nombre, apellido, correo, usuario, clave);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        
+        return userModel;
+    }
 
     public List<UserModel> obtenerTodosUsuarios() {
         List<UserModel> usuarios = new ArrayList<>();
@@ -76,6 +104,19 @@ public class UsuarioDAO {
             preparedStatement.setString(3, usuario.getUsuario());
             preparedStatement.setString(4, usuario.getClave());
             preparedStatement.setInt(5, usuario.getId());
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            // Manejar excepción
+            e.printStackTrace();
+        }
+    }
+    
+     // Método para actualizar un usuario en la base de datos
+    public void actualizarPassword(int id, String newPassword) {
+        try (Connection connection = conexion.conectar();
+            PreparedStatement preparedStatement = connection.prepareStatement(UPDATE_PASSWORD_USUARIO_SQL)) {            
+            preparedStatement.setString(1, newPassword);            
+            preparedStatement.setInt(2, id);
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
             // Manejar excepción

@@ -17,19 +17,21 @@
     <body>
     <center>
         <div class="container" style="margin-top: 80px;">
-            <form method="post" action="/Login_user/LoginController">
-                <div class="card" style="width: 30rem;">
-                <div class="card-body">
-                    <h2>Iniciar Sesion</h2>
-                    <input type="text" name="txtusuario" class="form-control mt-2" placeholder="Ingrese Usuario" required>
-                    <input type="password" name="txtclave" class="form-control mt-2" placeholder="Ingrese Clave" required>
-                    <input type="submit" class="btn btn-primary btn-block mt-2" name="btn-login" value="Ingresar">
-                    <p style="color: red;"><%=rspta %></p>
-                </div>
-            </div>
-            </form>
-                
-                <a href="resetPassword.jsp">Recuperar Contraseña</a>
+            
+            <a href="login.jsp">Volver a Login</a>
+             <form action="/Login_user/CRUDUsuarioServlet" method="post">
+
+                 
+                 
+        <!-- Campo oculto para indicar la acción a realizar -->
+        <input type="hidden" name="action" value="resetPassword"> 
+               
+        
+        Usuario: <input type="text" name="usuario" ><br>
+        
+
+        <input type="submit" value="Reiniciar Contraseña">
+    </form>
         </div>
     </center>
 </body>

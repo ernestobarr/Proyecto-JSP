@@ -10,7 +10,7 @@ import java.sql.Statement;
 public class conexion {
     public static String url = "jdbc:mysql://localhost:3306/dbuser";
     public static String usuario = "root";
-    public static String clave = "root";
+    public static String clave = "admin";
     public static String clase = "com.mysql.jdbc.Driver";
     private static Connection conexion = null;
 

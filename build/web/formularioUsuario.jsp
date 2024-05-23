@@ -7,6 +7,9 @@
     <title>Formulario de Usuario</title>
 </head>
 <body>
+    
+    <a href="menu.jsp">Volver a Menu</a>
+    
     <h1>Formulario de Usuario</h1>
     <form action="/Login_user/CRUDUsuarioServlet" method="post">
 

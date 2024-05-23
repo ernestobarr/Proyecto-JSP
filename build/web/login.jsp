@@ -28,6 +28,8 @@
                 </div>
             </div>
             </form>
+                
+                <a href="resetPassword.jsp">Recuperar Contraseña</a>
         </div>
     </center>
 </body>
