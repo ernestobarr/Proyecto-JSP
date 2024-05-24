@@ -19,7 +19,7 @@ import javax.mail.MessagingException;
 import javax.mail.PasswordAuthentication;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
-
+import at.favre.lib.crypto.bcrypt.BCrypt;
 import javax.activation.DataHandler;
 
 
@@ -59,6 +59,9 @@ public class CRUDUsuarioServlet extends HttpServlet {
                     break;
                 case "resetPassword":
                     resetPassword(request, response);
+                    break;
+                case "changePassword":
+                    changePassword(request, response);
                     break;
                 default:
                     // Manejar caso no válido
@@ -164,7 +167,41 @@ public class CRUDUsuarioServlet extends HttpServlet {
         // Redirigir a alguna página de confirmación o volver a la lista de usuarios
         response.sendRedirect("login.jsp");
     }
-
+    
+    private void changePassword(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    String username = request.getParameter("username");
+    String currentPassword = request.getParameter("currentPassword");
+    String newPassword = request.getParameter("newPassword");
+    String confirmPassword = request.getParameter("confirmPassword");
+    
+    if (username == null || currentPassword == null || newPassword == null || confirmPassword == null ||
+        username.isEmpty() || currentPassword.isEmpty() || newPassword.isEmpty() || confirmPassword.isEmpty()) {
+        request.setAttribute("errorMessage", "Por favor, complete todos los campos");
+        request.getRequestDispatcher("changePassword.jsp").forward(request, response);
+        return;
+    }
+    
+    if (!newPassword.equals(confirmPassword)) {
+        request.setAttribute("errorMessage", "Las nuevas contraseñas no coinciden");
+        request.getRequestDispatcher("changePassword.jsp").forward(request, response);
+        return;
+    }
+    
+    UsuarioDAO usuarioDAO = new UsuarioDAO();
+    UserModel user = usuarioDAO.obtenerPorUsuario(username);
+    
+    if (user == null || !BCrypt.verifyer().verify(currentPassword.toCharArray(), user.getClave()).verified) {
+        request.setAttribute("errorMessage", "El nombre de usuario o la contraseña actual son incorrectos");
+        request.getRequestDispatcher("changePassword.jsp").forward(request, response);
+        return;
+    }
+    
+    // Si todas las validaciones pasan, actualiza la contraseña en la base de datos
+    usuarioDAO.actualizarPassword(user.getId(), newPassword);
+    
+    // Redirige a la página de confirmación o a donde corresponda
+    response.sendRedirect("menu.jsp");
+}
     
      // Método para generar una contraseña aleatoria
     private String generarContraseñaAleatoria() {
